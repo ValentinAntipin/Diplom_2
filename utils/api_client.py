@@ -28,3 +28,8 @@ class ApiClient:
     def get_user_orders(self, token):
         headers = {"Authorization": f"Bearer {token}"}
         return self.session.get(f"{BASE_URL}/orders", headers=headers)
+
+    @allure.step("Удаление пользователя с токеном: {access_token}")
+    def delete_user(self, access_token):
+        headers = {"Authorization": f"Bearer {access_token}"}
+        return self.session.delete(f"{BASE_URL}/auth/user", headers=headers)

@@ -1,34 +1,49 @@
-import pytest
 import allure
+from data.response_messages import INVALID_CREDENTIALS_ERROR
 
 
-@allure.epic("Аутентификация пользователей")
-@allure.feature("Вход в систему")
+@allure.epic("Аутентификация")
+@allure.feature("Логин пользователя")
 class TestUserLogin:
 
-    @allure.story("Вход с валидными учетными данными")
+    @allure.story("Успешный логин")
     @allure.severity(allure.severity_level.CRITICAL)
-    @allure.title("Вход существующего пользователя должен возвращать токен доступа")
-    def test_login_existing_user(self, registered_user, client):
-        with allure.step("Отправка запроса на вход с корректными учетными данными"):
-            response = client.login_user(registered_user)
+    @allure.title("Успешная авторизация с корректными данными")
+    def test_successful_login(self, client, registered_user):
+        user, _ = registered_user
+        with allure.step("Отправка запроса на логин"):
+            response = client.login_user(user)
+            response_data = response.json()
 
-        with allure.step("Проверка, что ответ содержит статус 200 и токен доступа"):
-            assert response.status_code == 200, "Ожидался статус 200"
-            token = response.json().get("accessToken")
-            assert token is not None, "Отсутствует токен доступа"
-            allure.attach(token, name="Токен доступа", attachment_type=allure.attachment_type.TEXT)
+            allure.attach(
+                str(response_data),
+                name="Login Response",
+                attachment_type=allure.attachment_type.JSON
+            )
 
-    @allure.story("Вход с некорректными учетными данными")
+        with allure.step("Проверка успешного логина"):
+            assert response.status_code == 200
+            assert response_data.get("success") is True
+            assert "accessToken" in response_data
+            assert "refreshToken" in response_data
+
+    @allure.story("Неуспешный логин при неправильном пароле")
     @allure.severity(allure.severity_level.NORMAL)
-    @allure.title("Вход с неверными учетными данными должен вернуть 401")
-    def test_login_wrong_credentials(self, client):
-        wrong_user = {"email": "wrong@yandex.ru", "password": "654321"}
+    @allure.title("Попытка логина с неверным паролем должна завершиться ошибкой")
+    def test_login_with_wrong_password(self, client, registered_user):
+        user, _ = registered_user
+        user["password"] = "incorrect_password"
 
-        with allure.step("Отправка запроса на вход с неверными учетными данными"):
-            response = client.login_user(wrong_user)
+        with allure.step("Попытка логина с неправильным паролем"):
+            response = client.login_user(user)
+            response_data = response.json()
 
-        with allure.step("Проверка, что возвращён статус 401 и корректное сообщение об ошибке"):
-            assert response.status_code == 401, "Ожидался статус 401"
-            message = response.json().get("message")
-            assert message == "email or password are incorrect", f"Неожиданное сообщение: {message}"
+            allure.attach(
+                str(response_data),
+                name="Failed Login Response",
+                attachment_type=allure.attachment_type.JSON
+            )
+
+        with allure.step("Проверка отказа в авторизации"):
+            assert response.status_code == 401
+            assert response_data.get("message") == INVALID_CREDENTIALS_ERROR
