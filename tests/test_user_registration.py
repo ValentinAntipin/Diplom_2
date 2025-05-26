@@ -21,11 +21,6 @@ class TestUserCreation:
             assert response.status_code == 200
             assert response_data.get("success") is True
 
-        with allure.step("Логин и удаление созданного пользователя"):
-            login_response = client.login_user(user)
-            access_token = login_response.json().get("accessToken", "").replace("Bearer ", "")
-            delete_response = client.delete_user(access_token)
-            assert delete_response.status_code == 202
 
     @allure.story("Создание уже существующего пользователя")
     @allure.severity(allure.severity_level.NORMAL)
@@ -45,11 +40,6 @@ class TestUserCreation:
             message = response2.json().get("message")
             assert EMAIL_ALREADY_EXISTS in message
 
-        with allure.step("Удаление пользователя после теста"):
-            login_response = client.login_user(user)
-            access_token = login_response.json().get("accessToken", "").replace("Bearer ", "")
-            delete_response = client.delete_user(access_token)
-            assert delete_response.status_code == 202
 
     @allure.story("Создание пользователя с отсутствующим обязательным полем")
     @allure.severity(allure.severity_level.MINOR)

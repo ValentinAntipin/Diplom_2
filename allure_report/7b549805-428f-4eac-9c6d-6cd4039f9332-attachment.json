@@ -1,1 +1,0 @@
-{'success': True, 'accessToken': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MzIyNGRmOWVkMjgwMDAxYjVmYTAxNSIsImlhdCI6MTc0ODExNjcwMywiZXhwIjoxNzQ4MTE3OTAzfQ.ahlI6-F4tV2htepeTdoQdywDkXpsJOYDcA79wYI8xqA', 'refreshToken': '70fe5a222bc141e4614042daca7e87163a3bad49657e65096fe9af20d3b015f7e9ba88395d9c3b61', 'user': {'email': 'user_14723@test.ru', 'name': 'Test User'}}

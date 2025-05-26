@@ -2,9 +2,7 @@ import pytest
 import allure
 from utils.api_client import ApiClient
 from data.user_data import generate_user
-
-VALID_INGREDIENTS = ["61c0c5a71d1f82001bdaaa6d", "61c0c5a71d1f82001bdaaa75"]
-INVALID_INGREDIENTS = ["invalid_hash"]
+from data.ingredients_data import VALID_INGREDIENTS, INVALID_INGREDIENTS
 
 
 @pytest.fixture(scope="session")

@@ -1,6 +1,6 @@
 import pytest
 import allure
-from conftest import VALID_INGREDIENTS, INVALID_INGREDIENTS
+from data.ingredients_data import VALID_INGREDIENTS, INVALID_INGREDIENTS
 from data.response_messages import INGREDIENTS_REQUIRED_ERROR, INVALID_INGREDIENTS_ERROR
 
 
@@ -57,13 +57,13 @@ class TestOrderCreation:
     def test_create_order_with_invalid_ingredients(self, client, auth_token):
         with allure.step("Отправка запроса на создание заказа с неверными ингредиентами"):
             response = client.create_order(INVALID_INGREDIENTS, auth_token)
-            try:
-                data = response.json()
-            except Exception as e:
-                pytest.fail(f"Не удалось распарсить JSON из ответа сервера: {e}")
+            assert response.headers.get("Content-Type", "").startswith("application/json"), \
+                f"Ответ не является JSON: {response.text}"
+            data = response.json()
 
         with allure.step("Проверка, что заказ не создаётся и возвращается ошибка"):
-            assert response.status_code in [400, 500]
+            assert response.status_code in [400, 500], \
+                f"Ожидался статус 400 или 500, получен {response.status_code}"
             assert data.get("message") == INVALID_INGREDIENTS_ERROR
             allure.attach(str(data), name="Ошибка с неверными ингредиентами",
                           attachment_type=allure.attachment_type.JSON)
